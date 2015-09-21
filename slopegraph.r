@@ -60,7 +60,7 @@ build_slopegraph <- function(df, x, y, group, method="tufte", min.space=0.05) {
         df <- mutate(df, ypos=y)               
         return(df)
     } else if (method=="rank") {
-        df <- ddply(df, .(x), summarize, x=x, y=y, group=group, ypos=rank(y))
+        df <- ddply(df, .(x), summarize, x=x, y=y, group=group, colour=colour, ypos=rank(y))
         return(df)
     } else if (method=="tufte") {
         df <- tufte_sort(df, min.space=min.space)
@@ -112,6 +112,7 @@ calc_spaced_offset <- function(df, min.space) {
     df.new <- data.frame(group=df$group[ord],
                          x=df$x[ord],
                          y=df$y[ord],
+                         color=df$colour[ord],
                          ypos=offset+df$y[ord])
   return(df.new)
 }
@@ -198,7 +199,7 @@ plot_slopegraph <- function(df) {
     yvals <- subset(df, x==head(x,1))$ypos
     fontSize <- 2.5
     gg <- ggplot(df,aes(x=x,y=ypos)) +
-        geom_line(aes(group=group ,colour=group) +
+        geom_line(aes(group=group ,colour=colour) +
         geom_point(colour="white",size=8) +
         geom_text(aes(label=y),size=fontSize) +
         scale_y_continuous(name="", breaks=yvals, labels=ylabs)
