@@ -1,7 +1,7 @@
 ##' @title R script for creating slopegraphs
 ##' @author James Keirstead
 ##' 12 December 2013
-##' http://www.jameskeirstead.ca/r/slopegraphs-in-r/ 
+##' http://www.jameskeirstead.ca/r/slopegraphs-in-r/
 
 ##' Build a slopegraph data set
 ##'
@@ -12,7 +12,7 @@
 ##' \item an ordered factor giving the x intervals
 ##' \item a numeric giving the y values
 ##' }
-##' 
+##'
 ##' @param df the raw data frame
 ##' @param x a character giving the name of the x-axis column.  This
 ##' column must be an ordered factor.
@@ -57,7 +57,7 @@ build_slopegraph <- function(df, x, y, group, method="tufte", min.space=0.05) {
         df <- spaced_sort(df, min.space=min.space)
         return(df)
     } else if (method=="none") {
-        df <- mutate(df, ypos=y)               
+        df <- mutate(df, ypos=y)
         return(df)
     } else if (method=="rank") {
         df <- ddply(df, .(x), summarize, x=x, y=y, group=group, ypos=rank(y))
@@ -90,7 +90,7 @@ spaced_sort <- function(df, min.space=0.05) {
 }
 
 ##' Calculates the vertical offset between successive data points
-##' 
+##'
 ##' @param df a data frame representing a single year of data
 ##' @param min.space the minimum spacing between y values
 ##' @return a data frame
@@ -100,7 +100,7 @@ calc_spaced_offset <- function(df, min.space) {
     ord <- order(df$y, decreasing=T)
     ## Calculate the difference between adjacent values
     delta <- -1*diff(df$y[ord])
-    ## Adjust to ensure that minimum space requirement is met 
+    ## Adjust to ensure that minimum space requirement is met
     offset <- (min.space - delta)
     offset <- replace(offset, offset<0, 0)
     ## Add a trailing zero for the lowest value
@@ -130,7 +130,7 @@ tufte_sort <- function(df, min.space=0.05) {
     tmp <- dcast(df, group ~ x, value.var="y")
     ord <- order(tmp[,2])
     tmp <- tmp[ord,]
-    
+
     min.space <- min.space*diff(range(tmp[,-1]))
     yshift <- numeric(nrow(tmp))
     ## Start at "bottom" row
@@ -143,7 +143,7 @@ tufte_sort <- function(df, min.space=0.05) {
         yshift[i] <- ifelse(d.min < min.space, min.space - d.min, 0)
     }
 
-    
+
     tmp <- cbind(tmp, yshift=cumsum(yshift))
 
     scale <- 1
@@ -152,7 +152,7 @@ tufte_sort <- function(df, min.space=0.05) {
 
     tmp <- transform(tmp, ypos=y + scale*yshift)
     return(tmp)
-   
+
 }
 
 
@@ -176,7 +176,7 @@ theme_slopegraph <- function (base_size = 12, base_family = "") {
           panel.border = element_blank(),
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
-          panel.margin = unit(0.25, "lines"), 
+          panel.margin = unit(0.25, "lines"),
           strip.background = element_blank(),
           strip.text.x = element_text(size = rel(0.8)),
           strip.text.y = element_blank(),
@@ -192,17 +192,15 @@ theme_slopegraph <- function (base_size = 12, base_family = "") {
 ##' @param df a data frame giving the data
 ##' @return a ggplot object
 ##' @import ggplot2
-plot_slopegraph <- function(df, font_size=2.5, axis_pos = "left") {
+plot_slopegraph <- function(df, font_size=2.5, axis_pos = "left",
+                            slope_col = "grey80") {
     ylabs <- subset(df, x==head(x,1))$group
     yvals <- subset(df, x==head(x,1))$ypos
     fontSize <- font_size
     gg <- ggplot(df,aes(x=x,y=ypos)) +
-        geom_line(aes(group=group),colour="grey80") +
+        geom_line(aes(group=group),colour=slope_col) +
         geom_point(colour="white",size=8) +
         geom_text(aes(label=y),size=fontSize) +
         scale_y_continuous(name="", breaks=yvals, labels=ylabs, position = axis_pos)
     gg.form <- gg + theme_slopegraph()
     return(gg.form)
-}
-    
-
