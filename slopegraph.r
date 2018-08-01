@@ -199,7 +199,7 @@ plot_slopegraph <- function(df) {
     yvals <- subset(df, x==head(x,1))$ypos
     fontSize <- 2.5
     gg <- ggplot(df,aes(x=x,y=ypos)) +
-        geom_line(aes(group=group ,colour=colour) +
+        geom_line(aes(group=group ,colour=colour)) +
         geom_point(colour="white",size=8) +
         geom_text(aes(label=y),size=fontSize) +
         scale_y_continuous(name="", breaks=yvals, labels=ylabs)
