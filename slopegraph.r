@@ -227,7 +227,7 @@ plot_slopegraph <- function(df,
   fontSize <- font_size
   gg <- ggplot(df, aes(x = x, y = ypos)) +
     geom_line(aes(group = group), colour = slope_col) +
-    geom_point(colour = "white", size = 8) +
+    geom_point(colour = "white", size = 16) +
     geom_text(aes(label = y), size = fontSize) +
     scale_y_continuous(
       name = "",
